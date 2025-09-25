@@ -1,0 +1,120 @@
+<!-- src/app/home/home.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Home</ion-title>
+
+    
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/nuevo-genero']">
+        Género
+      </ion-button>
+      <ion-button [routerLink]="['/nuevo-artista']">
+        Artista
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Buscar artistas, géneros, álbumes o canciones"
+      (ionInput)="onSearch($event)"
+      [debounce]="400">
+    </ion-searchbar>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content>
+
+  <!-- Errores -->
+  <ion-text color="danger" *ngIf="error" style="padding: 12px; display:block;">
+    {{ error }}
+  </ion-text>
+
+  <!-- Estado de búsqueda -->
+  <ion-text *ngIf="searchTerm && searching" style="padding: 12px; display:block;">
+    Buscando "{{ searchTerm }}"...
+  </ion-text>
+
+  <!-- Resultados de búsqueda -->
+  <ng-container *ngIf="searchTerm && results">
+
+    <ion-list *ngIf="results.artistas?.length">
+      <ion-item lines="full">
+        <ion-label><strong>Artistas</strong></ion-label>
+      </ion-item>
+      <ion-item *ngFor="let a of results.artistas" [routerLink]="['/artistas', a.id]">
+        <ion-thumbnail slot="start"><img [src]="a.imagenUrl || ''" alt=""/></ion-thumbnail>
+        <ion-label>
+          <h3>{{ a.nombre }}</h3>
+          <p *ngIf="a.generos !== undefined">
+            Géneros:
+            <span *ngFor="let g of a.generos; let last = last" [routerLink]="['/generos', g.id]">
+              {{ g.nombre }}<span *ngIf="!last">, </span>
+            </span>
+          </p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="results.generos?.length">
+      <ion-item lines="full">
+        <ion-label><strong>Géneros</strong></ion-label>
+      </ion-item>
+      <ion-item *ngFor="let g of results.generos">
+        <ion-label>{{ g.nombre }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="results.albums?.length">
+      <ion-item lines="full">
+        <ion-label><strong>Álbumes</strong></ion-label>
+      </ion-item>
+      <ion-item *ngFor="let al of results.albums"  [routerLink]="['/albums', al.id]">
+        <ion-thumbnail slot="start"><img [src]="al.imagenUrl || ''" alt=""/></ion-thumbnail>
+        <ion-label>{{ al.nombre }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="results.canciones?.length">
+      <ion-item lines="full">
+        <ion-label><strong>Canciones</strong></ion-label>
+      </ion-item>
+      <ion-item *ngFor="let c of results.canciones">
+        <ion-thumbnail slot="start"><img [src]="c.imagenUrl || ''" alt=""/></ion-thumbnail>
+        <ion-label>
+          <h3>{{ c.nombre }}</h3>
+          <p *ngIf="c.archivoUrl">Archivo: {{ c.archivoUrl }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-text *ngIf="!results.artistas?.length && !results.generos?.length && !results.albums?.length && !results.canciones?.length" style="padding: 12px; display:block;">
+      Sin resultados para "{{ searchTerm }}".
+    </ion-text>
+
+  </ng-container>
+
+  <!-- Listas normales (cuando no hay búsqueda activa) -->
+  <ng-container *ngIf="!searchTerm">
+    <ion-list>
+      <ion-item lines="full">
+        <ion-label><strong>Artistas</strong></ion-label>
+      </ion-item>
+      <ion-item *ngFor="let a of artistas" [routerLink]="['/artistas', a.id]">
+        <ion-thumbnail slot="start"><img [src]="a.imagenUrl || ''" alt=""/></ion-thumbnail>
+        <ion-label>{{ a.nombre }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
+      <ion-item lines="full">
+        <ion-label><strong>Géneros</strong></ion-label>
+      </ion-item>
+      <ion-item *ngFor="let g of generos" [routerLink]="['/generos', g.id]">
+        <ion-label>{{ g.nombre }}</ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+</ion-content>

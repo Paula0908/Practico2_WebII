@@ -1,0 +1,94 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Géneros</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- ====== CREAR GÉNERO ====== -->
+  <ion-list>
+    <ion-item lines="full">
+      <ion-label><strong>Crear género</strong></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Nombre *</ion-label>
+      <ion-input [formControl]="createForm.controls.nombre" placeholder="Nombre del género"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-text color="danger" *ngIf="createError" style="padding:12px; display:block;">
+    {{ createError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="createSuccess" style="padding:12px; display:block;">
+    {{ createSuccess }}
+  </ion-text>
+
+  <div style="padding: 16px;">
+    <ion-button expand="block" (click)="submitCreate()" [disabled]="createLoading">
+      {{ createLoading ? 'Guardando...' : 'Crear género' }}
+    </ion-button>
+  </div>
+
+  <hr style="opacity:.2; margin: 12px 0" />
+
+  <!-- ====== EDITAR GÉNERO ====== -->
+  <ion-list>
+    <ion-item lines="full">
+      <ion-label><strong>Editar género</strong></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Selecciona género</ion-label>
+      <ion-select [formControl]="editForm.controls.generoId" interface="popover" placeholder="Elegir"
+                  (ionChange)="prefillNombreDesdeSeleccion()">
+        <ion-select-option *ngFor="let g of generos" [value]="g.id">{{ g.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Nuevo nombre</ion-label>
+      <ion-input [formControl]="editForm.controls.nombre" placeholder="Nuevo nombre"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-text color="danger" *ngIf="editError" style="padding:12px; display:block;">
+    {{ editError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="editSuccess" style="padding:12px; display:block;">
+    {{ editSuccess }}
+  </ion-text>
+
+  <div style="padding: 16px;">
+    <ion-button expand="block" (click)="submitEdit()" [disabled]="editLoading">
+      {{ editLoading ? 'Guardando...' : 'Guardar cambios' }}
+    </ion-button>
+  </div>
+  <!-- ====== ELIMINAR GÉNERO ====== -->
+  <ion-list *ngIf="editForm.value.generoId">
+    <ion-item lines="full">
+      <ion-label><strong>Eliminar género</strong></ion-label>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label>
+      Seleccionado: <strong>{{ selectedGenero?.nombre || '—' }}</strong>
+      </ion-label>
+      <ion-button slot="end" color="danger" (click)="confirmDeleteGenero()" [disabled]="deleteLoading">
+        {{ deleteLoading ? 'Eliminando...' : 'Eliminar' }}
+      </ion-button>
+    </ion-item>
+  </ion-list>
+  
+  <ion-text color="danger" *ngIf="deleteError" style="padding:12px; display:block;">
+    {{ deleteError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="deleteSuccess" style="padding:12px; display:block;">
+    {{ deleteSuccess }}
+  </ion-text>
+
+</ion-content>

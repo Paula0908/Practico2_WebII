@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ genero?.nombre || 'Género' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item *ngIf="loading"><ion-label>Cargando...</ion-label></ion-item>
+  <ion-text *ngIf="error" color="danger" style="padding: 12px; display:block;">{{ error }}</ion-text>
+
+  <ion-list *ngIf="!loading && artistas.length">
+    <ion-item lines="full">
+      <ion-label><strong>Artistas</strong></ion-label>
+    </ion-item>
+
+    <ion-item *ngFor="let a of artistas" [routerLink]="['/artistas', a.id]">
+      <ion-thumbnail slot="start">
+        <img [src]="a.imagenUrl || ''" alt="" />
+      </ion-thumbnail>
+      <ion-label>
+        <h3>{{ a.nombre }}</h3>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-text *ngIf="!loading && !artistas.length" style="padding: 12px; display:block;">
+    No hay artistas en este género.
+  </ion-text>
+</ion-content>

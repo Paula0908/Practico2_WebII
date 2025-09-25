@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>Album</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/canciones', (album?.id || id), 'nueva-cancion']">
+        Cancion :3
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item *ngIf="loading"><ion-label>Cargando...</ion-label></ion-item>
+  <ion-item *ngIf="error"><ion-label color="danger">{{ error }}</ion-label></ion-item>
+
+  <ng-container *ngIf="!loading && album">
+    <ion-item lines="full">
+      <ion-thumbnail slot="start">
+        <img [src]="album.imagenUrl || ''" alt=""/>
+      </ion-thumbnail>
+      <ion-label><h2>{{ album.nombre }}</h2></ion-label>
+    </ion-item>
+
+    <ion-list *ngIf="canciones.length">
+      <ion-item lines="full">
+        <ion-label><strong>Canciones</strong></ion-label>
+      </ion-item>
+
+      <ion-item *ngFor="let c of canciones">
+        <ion-thumbnail slot="start">
+          <img [src]="c.imagenUrl || ''" alt=""/>
+        </ion-thumbnail>
+
+        <ion-label>
+          <h3>{{ c.nombre }}</h3>
+
+          <!-- botón para mostrar/ocultar el <audio> -->
+          <ion-button size="small" (click)="toggleAudio(c)" style="margin-top:6px; ">
+            {{ playingId === c.id ? 'Detener' : 'Reproducir' }}
+          </ion-button>
+
+          <!-- reproductor HTML justo debajo -->
+          <div *ngIf="playingId === c.id" style="margin-top:8px;">
+            <audio
+              *ngIf="c.archivoUrl"
+              [src]="c.archivoUrl"
+              controls
+              autoplay
+              style="width:100%;">
+            </audio>
+            <ion-text color="medium" *ngIf="!c.archivoUrl">
+              No hay archivo de audio.
+            </ion-text>
+          </div>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+</ion-content>

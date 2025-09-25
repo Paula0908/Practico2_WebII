@@ -1,0 +1,178 @@
+<!-- src/app/cancion-create/cancion-create.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Canciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- ===== CREAR CANCIÓN ===== -->
+  <ion-list>
+    <ion-item lines="full">
+      <ion-label><strong>Crear canción</strong></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Nombre *</ion-label>
+      <ion-input [formControl]="createForm.controls.nombre" placeholder="Nombre de la canción"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Archivo de audio * (.mp3, .wav, .ogg, .m4a, .flac)</ion-label>
+      <input type="file" accept=".mp3,.wav,.ogg,.m4a,.flac,audio/*" (change)="onCreateAudioChange($event)">
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Imagen (opcional)</ion-label>
+      <input type="file" accept="image/*" (change)="onCreateImageChange($event)">
+    </ion-item>
+  </ion-list>
+
+  <ion-text color="danger" *ngIf="createError" style="padding:12px; display:block;">
+    {{ createError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="createSuccess" style="padding:12px; display:block;">
+    {{ createSuccess }}
+  </ion-text>
+
+  <div style="padding: 16px;">
+    <ion-button expand="block" (click)="submitCreate()" [disabled]="createLoading">
+      {{ createLoading ? 'Guardando...' : 'Crear canción' }}
+    </ion-button>
+  </div>
+
+  <hr style="opacity:.2; margin: 12px 0" />
+
+  <!-- ===== EDITAR CANCIÓN (selección) ===== -->
+  <ion-list>
+    <ion-item lines="full">
+      <ion-label><strong>Editar canción</strong></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Selecciona canción</ion-label>
+      <ion-select [formControl]="selectedCancionId" interface="popover" placeholder="Elegir"
+                  (ionChange)="prefillDesdeSeleccion()">
+        <ion-select-option *ngFor="let c of canciones" [value]="c.id">
+          {{ c.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <!-- ===== EDITAR INFORMACIÓN (JSON) ===== -->
+  <ion-list *ngIf="cancionSeleccionada">
+    <ion-item lines="full">
+      <ion-label><strong>Editar información</strong></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Nombre *</ion-label>
+      <ion-input [formControl]="editInfoForm.controls.nombre" placeholder="Nombre"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-text color="danger" *ngIf="editInfoError" style="padding:12px; display:block;">
+    {{ editInfoError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="editInfoSuccess" style="padding:12px; display:block;">
+    {{ editInfoSuccess }}
+  </ion-text>
+
+  <div style="padding: 16px;" *ngIf="cancionSeleccionada">
+    <ion-button expand="block" (click)="submitEditInfo()" [disabled]="editInfoLoading">
+      {{ editInfoLoading ? 'Guardando...' : 'Guardar cambios' }}
+    </ion-button>
+  </div>
+
+  <!-- ===== CAMBIAR IMAGEN ===== -->
+  <ion-list *ngIf="cancionSeleccionada">
+    <ion-item lines="full">
+      <ion-label><strong>Cambiar imagen</strong></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-thumbnail slot="start">
+        <img [src]="cancionSeleccionada.imagenUrl || ''" alt="">
+      </ion-thumbnail>
+      <ion-label>Imagen actual</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Nueva imagen</ion-label>
+      <input type="file" accept="image/*" (change)="onEditImageChange($event)">
+    </ion-item>
+  </ion-list>
+
+  <ion-text color="danger" *ngIf="editImageError" style="padding:12px; display:block;">
+    {{ editImageError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="editImageSuccess" style="padding:12px; display:block;">
+    {{ editImageSuccess }}
+  </ion-text>
+
+  <div style="padding: 16px;" *ngIf="cancionSeleccionada">
+    <ion-button expand="block" (click)="submitEditImage()" [disabled]="editImageLoading || !editImageFile">
+      {{ editImageLoading ? 'Subiendo...' : 'Actualizar imagen' }}
+    </ion-button>
+  </div>
+
+  <!-- ===== CAMBIAR ARCHIVO DE AUDIO ===== -->
+  <ion-list *ngIf="cancionSeleccionada">
+    <ion-item lines="full">
+      <ion-label><strong>Cambiar archivo de audio</strong></ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Actual:</ion-label>
+    </ion-item>
+    <div style="padding: 12px;">
+      <audio *ngIf="cancionSeleccionada.archivoUrl" [src]="cancionSeleccionada.archivoUrl" controls></audio>
+    </div>
+
+    <ion-item>
+      <ion-label position="stacked">Nuevo archivo de audio</ion-label>
+      <input type="file" accept=".mp3,.wav,.ogg,.m4a,.flac,audio/*" (change)="onEditAudioChange($event)">
+    </ion-item>
+  </ion-list>
+
+  <ion-text color="danger" *ngIf="editAudioError" style="padding:12px; display:block;">
+    {{ editAudioError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="editAudioSuccess" style="padding:12px; display:block;">
+    {{ editAudioSuccess }}
+  </ion-text>
+
+  <div style="padding: 16px;" *ngIf="cancionSeleccionada">
+    <ion-button expand="block" (click)="submitEditAudio()" [disabled]="editAudioLoading || !editAudioFile">
+      {{ editAudioLoading ? 'Subiendo...' : 'Actualizar audio' }}
+    </ion-button>
+  </div>
+  <!-- ===== ELIMINAR CANCIÓN ===== -->
+  <ion-list *ngIf="cancionSeleccionada">
+    <ion-item lines="full">
+      <ion-label><strong>Eliminar canción</strong></ion-label>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label>
+        Seleccionada: <strong>{{ cancionSeleccionada.nombre }}</strong>
+      </ion-label>
+      <ion-button slot="end" color="danger" (click)="confirmDelete()" [disabled]="deleteLoading">
+        {{ deleteLoading ? 'Eliminando...' : 'Eliminar' }}
+      </ion-button>
+    </ion-item>
+  </ion-list>
+  
+  <ion-text color="danger" *ngIf="deleteError" style="padding:12px; display:block;">
+    {{ deleteError }}
+  </ion-text>
+  <ion-text color="success" *ngIf="deleteSuccess" style="padding:12px; display:block;">
+    {{ deleteSuccess }}
+  </ion-text>
+
+</ion-content>
